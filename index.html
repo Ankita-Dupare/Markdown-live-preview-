@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown note editor with live preview.</title>
+
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+       
+    *{
+        box-sizing: border-box;
+    }
+    
+        body{
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            height: 100vh;
+            color: #e0e0f0;
+            margin:0;
+            padding:0px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center; 
+        }
+
+        .container{
+            max-width: 1200px;
+            width:90%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            text-align: center;
+            padding: 40px;
+             background: rgba(255,255,255,0.05);
+              border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.5);
+            gap: 20px;
+        }
+
+        /* ---------- Header ---------- */
+        .header{
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1{
+            font-size: 3rem;
+            color: #8be9fd;
+            text-shadow: 0 0 20px #8be9fd;
+        }
+
+        .header .subtitle{
+            font-size: 1.2rem;
+            color: #ff79c6;
+            height: 1.4em;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #ff79c6;
+            animation:
+                typing 3s steps(30, end) infinite,
+                blink 0.7s infinite step-end;
+        }
+
+        @keyframes typing {
+            0%, 20% { width: 0; }
+            80%, 100% { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        textarea, .preview {
+            padding: 20px;
+            border-radius: 15px;
+            border: none;
+            background: rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 8px rgba(255,255,255,0.1);
+            transition: transform 0.5s ease, box-shadow 0.3s;
+        }
+
+        textarea{
+            color: #e0e0f0;
+            font-size: 1rem;
+            resize: none;
+            width: 100%;
+            height: calc(100% - 40px);
+            outline: none;
+            border-right: 2px solid #50fa7b;
+            background-repeat: no-repeat;
+            background-image:
+            linear-gradient(to right, #50fa7b 0%, #50fa7b 0%),
+            linear-gradient(to right, #ffb86c 0%, #ffb86c 0%);    
+            background-size: 0 2px, 0 2px;
+            background-position: left bottom, left top;
+            background-repeat: no-repeat;
+            animation: neonBorder 5s ease-in-out infinite;
+        }
+
+        textarea:focus{
+          box-shadow: 0 0 15px #50fa7b;
+        }
+
+        @keyframes neonBorder{
+            0%, 100% { background-size: 0 2px, 0 2px; }
+            25% { background-size: 100% 2px, 0 2px; }
+            50% { background-size: 100% 2px, 100% 2px; } 
+            75% { background-size: 0 2px, 100% 2px; }
+        }
+    
+
+        .preview{
+            height: 200px;
+            color: #e0e0f0;
+            overflow-y: auto;
+        }
+
+        .preview h1, 
+        .preview h2, 
+        .preview h3{
+            color: #ff79c6;
+        }
+
+        .preview p {
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .preview strong{
+            color: #f1fa8c;
+        }
+
+        .preview em{
+            color: #8be9fd;
+        }   
+
+        .preview del{
+            color: #f55;
+        }
+
+         .card-container{
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+            perspective: 800px;
+        }
+
+        .card{
+            width: 200px;
+            height: 260px;
+            background:linear-gradient(135deg, #bd93f9, #ff79c6);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            animation: rotate3d 8s infinite linear;
+        }
+
+        .card::before, .card::after{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            backface-visibility: hidden;
+        }
+
+        .card::before{
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateZ(20px);
+        }
+
+        .card::after{
+            background: rgba(0, 0, 0, 0.1);
+            transform: rotateY(180deg) translateZ(20px);
+        }
+
+        @keyframes rotate3d{
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+
+        /*---------- Responsive ---------- */
+         @media screen and (max-width: 768px){
+            .container{
+                grid-template-columns: 1fr;
+            }
+
+            .card-container{
+                margin-top: 20px;
+            }
+        } 
+
+       
+    </style>
+</head>
+<body>
+       <div class="container" data-aos="fade-up">
+            <div class="header">
+                <h1 data-aos="zoom-in">Markdown Editor</h1>
+                <div class="subtitle">Type, Preview & Shine!</div>
+            </div>
+
+           <textarea id="markdown" placeholder="Start typing **Markdown** here..."  data-aos="fade-right"></textarea>
+           <div id="preview" class="preview" data-aos="fade-left"></div>
+
+         <div class="card-container" data-aos="zoom-in" data-aos-delay="500">
+            <div class="card">  
+            </div>
+           </div>
+         
+       
+
+
+         <!-- AOS JS -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({ once: true, duration: 800 });
+  </script>
+
+  <script>
+
+    // function to convert markdown to HTML
+    function convertMarkdownToHTML(md){
+        //convert headings
+        md = md.replace(/### (.*?)(\n|$)/g, '<h3>$1</h3>')
+        md = md.replace(/## (.*?)(\n|$)/g, '<h2>$1</h2>')
+        md = md.replace(/# (.*?)(\n|$)/g, '<h1>$1</h1>')
+
+        //convert bold and italic text
+        md = md.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        md = md.replace(/\*(.*?)\*/g, '<em>$1</em>')
+
+        //convert strikethrough text
+        md = md.replace(/~~(.*?)~~/g, '<del>$1</del>')
+
+        //replace new lines with <br> better readability
+        return md.replace(/\n/g, '<br>');
+
+    }
+
+    //select the textarea and preview elements
+    const textarea = document.getElementById('markdown');
+    const preview = document.getElementById('preview');
+
+    //listen for user input in the textarea
+    textarea.addEventListener('input', () => {
+        //convert markdown to HTML and set it as the innerHTML of the preview element
+        preview.innerHTML = convertMarkdownToHTML(textarea.value);
+    });
+  </script>
+</body>
+</html>
